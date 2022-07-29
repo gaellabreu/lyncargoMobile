@@ -4,8 +4,8 @@ import 'package:lyncargo/models/Session.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-      ChangeNotifierProvider(create: (context) => Session(), child: MyApp()));
+  runApp(ChangeNotifierProvider(
+      create: (context) => Session(), builder: (context, child) => MyApp()));
 }
 
 class MyApp extends StatelessWidget {

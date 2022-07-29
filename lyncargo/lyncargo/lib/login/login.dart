@@ -35,13 +35,14 @@ class _LoginState extends State<Login> {
     debugPrint(base64Credencials.toString());
 
     var response = await http.get(
-        'https://lyncargocloud.ddns.net/bprestservices/logincliente.rsvc',
+        'https://lyncargo.westcentralus.cloudapp.azure.com/bprestservices/logincliente.rsvc',
         headers: {
           'X-Api-Key': 'CALi10rrcxbjC8DklVO93NMhZwxekwx5zb234ff4f53fdf33yil',
           'X-Bpdominio-Id': 'lce',
           'Authorization': 'Basic $base64Credencials'
         });
 
+    print('klk');
     print(response.body);
 
     if (response.statusCode == 401) {

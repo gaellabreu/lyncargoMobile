@@ -8,7 +8,8 @@ class ShipDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('${shipment.hawbl}'),
+          title: Text(
+              '${shipment.hawbl == "" ? "BL no disponible" : shipment.hawbl}'),
         ),
         body: ListView(
           children: <Widget>[
@@ -37,19 +38,13 @@ class ShipDetail extends StatelessWidget {
               subtitle: const Text('HBL'),
             ),
             ListTile(
-              title: Text('${shipment.mawbl}'),
-              subtitle: const Text('MBL'),
-            ),
-            ListTile(
-              title: Text('${shipment.shippingCompany}'),
-              subtitle: const Text('Transportista'),
-            ),
-            ListTile(
-              title: Text('${shipment.disembarked}'),
+              title: Text(
+                  '${shipment.disembarked == null ? "(No disponible)" : shipment.disembarked}'),
               subtitle: const Text('Origen'),
             ),
             ListTile(
-              title: Text('${shipment.embarked}'),
+              title: Text(
+                  '${shipment.embarked == null ? "(No disponible)" : shipment.embarked}'),
               subtitle: const Text('Destino'),
             ),
           ],

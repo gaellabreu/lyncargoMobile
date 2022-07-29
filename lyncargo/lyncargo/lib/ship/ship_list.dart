@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:lyncargo/models/Session.dart';
@@ -20,6 +19,8 @@ class _ShipListState extends State<ShipList> {
   @override
   void initState() {
     super.initState();
+
+    //DESDE AQUI PONES LO QUE QUIERAS HACER
   }
 
   @override
@@ -29,37 +30,79 @@ class _ShipListState extends State<ShipList> {
   }
 
   final List<Shipments> shipments = [];
+  final status = ["LIBERADO", "CANCELADO", "MANIFESTADO", "AVISADO", null];
 
   getShipments() async {
+    var tokenDate = Provider.of<Session>(context, listen: false).created;
+
+    if (new DateTime.now().difference(tokenDate).inMinutes > 29) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Sesión expirada'),
+        duration: Duration(seconds: 3),
+      ));
+      Navigator.pop(context);
+    }
+
     var response = await http.get(
-        'https://lyncargocloud.ddns.net/bprestservices/ExpedientesCourier.rsvc',
+        'https://lyncargo.westcentralus.cloudapp.azure.com/bprestservices/ExpedientesCourier.rsvc',
         headers: {
           'X-Api-Key': 'CALi10rrcxbjC8DklVO93NMhZwxekwx5zb234ff4f53fdf33yil',
           'X-Bpdominio-Id': 'lce',
           'Authorization':
-              'Bearer ${Provider.of<Session>(context, listen: true).token}'
+              'Bearer ${Provider.of<Session>(context, listen: false).token}'
         });
 
     setState(() {
-      shipments.addAll((json.decode(response.body) as List)
+      var list = (json.decode(response.body) as List)
           .map((i) => Shipments.fromJson(i))
-          .toList());
+          .toList();
+
+      list.sort((a, b) {
+        var dia1 = int.parse(a.eta.split('/')[0]);
+        var mes1 = int.parse(a.eta.split('/')[1]);
+        var ano1 = int.parse(a.eta.split('/')[2]);
+
+        var dia2 = int.parse(b.eta.split('/')[0]);
+        var mes2 = int.parse(b.eta.split('/')[1]);
+        var ano2 = int.parse(b.eta.split('/')[2]);
+
+        return DateTime(ano2, mes2, dia2).millisecondsSinceEpoch -
+            DateTime(ano1, mes1, dia1).millisecondsSinceEpoch;
+      });
+
+      shipments.clear();
+      shipments.addAll(list);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${shipments.length} Embarques encontrados'),
+        duration: Duration(seconds: 3),
+      ));
     });
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.mail_outline),
-            onPressed: () => Navigator.of(context).push(CupertinoPageRoute(
-                builder: (BuildContext context) => QuoteMail())),
-          )
-        ], title: Text('${Provider.of<Session>(context, listen: true).name}')),
-        body: ListView.builder(
-            itemCount: shipments.length,
-            itemBuilder: (BuildContext context, int i) =>
-                ShipListItem(shipment: shipments[i])),
+        appBar: AppBar(
+            leading: new IconButton(
+                icon: Icon(Icons.refresh), onPressed: () => getShipments()),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.mail_outline),
+                onPressed: () => Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (BuildContext context) => QuoteMail(
+                          name:
+                              Provider.of<Session>(context, listen: true).name,
+                        ))),
+              )
+            ],
+            title: Text('${Provider.of<Session>(context, listen: true).name}')),
+        body: RefreshIndicator(
+          onRefresh: () => getShipments(),
+          child: ListView.builder(
+              itemCount: shipments.length,
+              itemBuilder: (BuildContext context, int i) =>
+                  ShipListItem(shipment: shipments[i])),
+        ),
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.search),
             onPressed: () => showSearch(
@@ -114,7 +157,9 @@ class ShipmentSearch extends SearchDelegate<Shipments> {
             (element.eta != null &&
                 element.eta.toLowerCase().contains(query.toLowerCase())) ||
             (element.hawbl != null &&
-                element.hawbl.toLowerCase().contains(query.toLowerCase()))))
+                element.hawbl.toLowerCase().contains(query.toLowerCase())) ||
+            (element.status != null &&
+                element.status.toLowerCase().contains(query.toLowerCase()))))
         .toList();
     return filter.length == 0
         ? Center(child: Text('Sin resultados'))

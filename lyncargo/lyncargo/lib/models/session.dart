@@ -1,25 +1,23 @@
-
-
 import 'package:flutter/foundation.dart';
 
-class Session extends ChangeNotifier{
+class Session extends ChangeNotifier {
   String code = '';
   String email = '';
   String token = '';
   String name = '';
   String rnc = '';
   String phone = '';
+  DateTime created = new DateTime.now();
 
   Session();
 
-  initSession(Session session){
+  initSession(Session session) {
     code = session.code;
     email = session.email;
     token = session.token;
     name = session.name;
     rnc = session.rnc;
     phone = session.phone;
-    
     notifyListeners();
   }
 

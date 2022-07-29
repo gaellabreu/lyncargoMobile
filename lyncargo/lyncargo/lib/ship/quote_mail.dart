@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:lyncargo/models/session.dart';
-import 'package:provider/provider.dart';
 
 class QuoteMail extends StatefulWidget {
+  final String name;
+  QuoteMail({Key key, @required this.name}) : super(key: key);
+
   @override
   _QuoteMailState createState() => _QuoteMailState();
 }
@@ -13,6 +14,7 @@ class _QuoteMailState extends State<QuoteMail> {
   final outController = new TextEditingController();
   final inController = new TextEditingController();
   final merchandiseController = new TextEditingController();
+  final commentController = new TextEditingController();
 
   void _sendQuotation() async {
     final Email email = Email(
@@ -30,13 +32,13 @@ class _QuoteMailState extends State<QuoteMail> {
       <p>
         <b>Tipo: </b> $dropdownValue
       </p>
+      <p>
+        <b>Observación: </b>
+        ${commentController.text}
+      </p>
       ''',
-      subject:
-          'COTIZACIÓN DE FLETE - BELLON S.A',
-      recipients: ['gaelfabreu@gmail.com'],
-      // cc: ['cc@example.com'],
-      // bcc: ['bcc@example.com'],
-      // attachmentPaths: ['/path/to/attachment.zip'],
+      subject: 'COTIZACIÓN DE FLETE - ${widget.name}',
+      recipients: ['info@lyncargo.net'],
       isHTML: true,
     );
 
@@ -48,33 +50,34 @@ class _QuoteMailState extends State<QuoteMail> {
         appBar: AppBar(
           title: const Text('Cotización'),
         ),
-        body: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TextField(
-                    controller: outController,
-                    decoration: InputDecoration(hintText: 'Lugar de salida'),
-                  ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextField(
+                  controller: outController,
+                  decoration: InputDecoration(hintText: 'Lugar de salida'),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TextField(
-                    controller: inController,
-                    decoration: InputDecoration(hintText: 'Lugar de llegada'),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextField(
+                  controller: inController,
+                  decoration: InputDecoration(hintText: 'Lugar de llegada'),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TextField(
-                    controller: merchandiseController,
-                    decoration: InputDecoration(hintText: 'Mercancía'),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextField(
+                  controller: merchandiseController,
+                  decoration: InputDecoration(hintText: 'Mercancía'),
                 ),
-                Container(
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Container(
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.blueGrey),
                       borderRadius: BorderRadius.circular(20)),
@@ -109,8 +112,16 @@ class _QuoteMailState extends State<QuoteMail> {
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextField(
+                  maxLines: 10,
+                  controller: commentController,
+                  decoration: InputDecoration(hintText: 'Comentario'),
+                ),
+              ),
+            ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
