@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:lyncargo/models/shipments.dart';
 import 'package:lyncargo/ship/ship_detail.dart';
 
+//Este es el widget para el Card o List Item que se renderiza en la lista de embarques
+//Stateless widget no hace re-render en ningun momento, pues no tiene estado
+//Es un widget estatico
 class ShipListItem extends StatelessWidget {
   final Shipments shipment;
+  //De esta forma pasamos parametros a otras pantallas
+  //Existen otras formas.
   ShipListItem({key, this.shipment}) : super(key: key);
 
   @override

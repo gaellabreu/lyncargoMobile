@@ -1,24 +1,27 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lyncargo/models/Session.dart';
 import 'package:lyncargo/ship/ship_list.dart';
 import 'package:provider/provider.dart';
 
+//Los Stateful widget se usan para widgets que vayan a mutar
+//Cuando vayas a cambiar o provocar un re-render del widget
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  //Los textEditingControllers se usan para manejar la data de los inputs
   final usernameController = new TextEditingController();
   final passwordController = new TextEditingController();
 
-  final snackBar = SnackBar(content: Text('Credenciales inválidas'));
+  final snackBar = SnackBar(
+    content: Text('Credenciales inválidas'),
+    duration: Duration(seconds: 3),
+  );
 
   @override
   void dispose() {
@@ -27,67 +30,61 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  testcall() async {
-    var bytes =
-        utf8.encode('${usernameController.text}:${passwordController.text}');
-    var base64Credencials = base64.encode(bytes);
-
-    debugPrint(base64Credencials.toString());
-
-    var response = await http.get(
-        'https://lyncargo.westcentralus.cloudapp.azure.com/bprestservices/logincliente.rsvc',
-        headers: {
-          'X-Api-Key': 'CALi10rrcxbjC8DklVO93NMhZwxekwx5zb234ff4f53fdf33yil',
-          'X-Bpdominio-Id': 'lce',
-          'Authorization': 'Basic $base64Credencials'
-        });
-
+  requestLogin() async {
+//El paquete http se usa para hacer requests, obvio, no?
     print('klk');
-    print(response.body);
+    var response = await http
+        .post(
+            'https://634b79d1d90b984a1e3a6809.mockapi.io/api/lyncargo/authenticate')
+        .onError((error, stackTrace) {
+      print('1');
+      print(error.toString());
+      print('2');
+      return null;
+    });
 
+    print(response);
     if (response.statusCode == 401) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('Credenciales inválidas'),
-        duration: Duration(seconds: 3),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
 
     Session session = new Session.fromJson(json.decode(response.body));
-
-    debugPrint(response.statusCode.toString());
-    debugPrint(response.body);
     Provider.of<Session>(context, listen: false).initSession(session);
 
     Navigator.push(
-        context, CupertinoPageRoute(builder: (context) => ShipList()));
+        context, MaterialPageRoute(builder: (context) => ShipList()));
   }
 
+//Seguro hay una forma mas inteligente para hacer este gradient :)
+  final gradientColors = [
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.white,
+    Colors.blue[50],
+    Colors.blue[200],
+    Colors.blue[300],
+    Colors.blue[400],
+    Colors.blue[600],
+  ];
+
+//El metodo build es donde se renderiza el widget
+//El widget tree puede ser algo confuso al principio, pero te acostumbras
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-              Colors.blue[50],
-              Colors.blue[200],
-              Colors.blue[300],
-              Colors.blue[400],
-              Colors.blue[600],
-            ])),
+                colors: gradientColors)),
         height: MediaQuery.of(context).size.height,
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20),
@@ -110,9 +107,9 @@ class _LoginState extends State<Login> {
                       prefixIcon: Icon(Icons.lock_outline),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: 'Contraseña')),
-              RaisedButton.icon(
-                onPressed: () => {testcall()},
-                icon: Icon(Icons.arrow_forward_ios),
+              ElevatedButton.icon(
+                onPressed: () => requestLogin(),
+                icon: const Icon(Icons.arrow_forward_ios),
                 label: const Text('Ingresar'),
               ),
               Spacer(),

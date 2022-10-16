@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lyncargo/models/shipments.dart';
 
+//Este es cuando le das click a una list item, hace una navegacion a esta pantalla
 class ShipDetail extends StatelessWidget {
   final Shipments shipment;
+  //De esta forma pasamos parametros a otras pantallas
+  //Existen otras formas.
   ShipDetail({key, this.shipment}) : super(key: key);
 
   @override

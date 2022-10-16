@@ -21,6 +21,6 @@ class Shipments {
         ets = f.format(new DateTime.fromMillisecondsSinceEpoch(
             DateTime.parse(json['ets'].toString()).millisecondsSinceEpoch)),
         hawbl = json['h_aw_bl'],
-        disembarked = json['puerto_desembarque'],
-        embarked = json['telpuerto_embarque1'];
+        disembarked = json['desembarque'],
+        embarked = json['embarque'];
 }

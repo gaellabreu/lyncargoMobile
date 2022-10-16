@@ -19,8 +19,6 @@ class _ShipListState extends State<ShipList> {
   @override
   void initState() {
     super.initState();
-
-    //DESDE AQUI PONES LO QUE QUIERAS HACER
   }
 
   @override
@@ -33,24 +31,8 @@ class _ShipListState extends State<ShipList> {
   final status = ["LIBERADO", "CANCELADO", "MANIFESTADO", "AVISADO", null];
 
   getShipments() async {
-    var tokenDate = Provider.of<Session>(context, listen: false).created;
-
-    if (new DateTime.now().difference(tokenDate).inMinutes > 29) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Sesión expirada'),
-        duration: Duration(seconds: 3),
-      ));
-      Navigator.pop(context);
-    }
-
     var response = await http.get(
-        'https://lyncargo.westcentralus.cloudapp.azure.com/bprestservices/ExpedientesCourier.rsvc',
-        headers: {
-          'X-Api-Key': 'CALi10rrcxbjC8DklVO93NMhZwxekwx5zb234ff4f53fdf33yil',
-          'X-Bpdominio-Id': 'lce',
-          'Authorization':
-              'Bearer ${Provider.of<Session>(context, listen: false).token}'
-        });
+        'https://634b79d1d90b984a1e3a6809.mockapi.io/api/lyncargo/shipments');
 
     setState(() {
       var list = (json.decode(response.body) as List)
@@ -80,22 +62,19 @@ class _ShipListState extends State<ShipList> {
     });
   }
 
+//Este es el build del widget de la lista
+//Ojo, de la lista, no de item individual, ese es otro widget.
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-            leading: new IconButton(
-                icon: Icon(Icons.refresh), onPressed: () => getShipments()),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.mail_outline),
-                onPressed: () => Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (BuildContext context) => QuoteMail(
-                          name:
-                              Provider.of<Session>(context, listen: true).name,
-                        ))),
-              )
-            ],
-            title: Text('${Provider.of<Session>(context, listen: true).name}')),
+        appBar: AppBar(actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.mail_outline),
+            onPressed: () => Navigator.of(context).push(CupertinoPageRoute(
+                builder: (BuildContext context) => QuoteMail(
+                      name: Provider.of<Session>(context, listen: true).name,
+                    ))),
+          )
+        ], title: Text('${Provider.of<Session>(context, listen: true).name}')),
         body: RefreshIndicator(
           onRefresh: () => getShipments(),
           child: ListView.builder(
@@ -111,6 +90,7 @@ class _ShipListState extends State<ShipList> {
       );
 }
 
+//Todo esto aqui debajo es para que funcione el search en toda la lista.
 class ShipmentSearch extends SearchDelegate<Shipments> {
   final List<Shipments> shipments;
 
