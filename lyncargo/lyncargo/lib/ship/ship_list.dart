@@ -39,19 +39,6 @@ class _ShipListState extends State<ShipList> {
           .map((i) => Shipments.fromJson(i))
           .toList();
 
-      list.sort((a, b) {
-        var dia1 = int.parse(a.eta.split('/')[0]);
-        var mes1 = int.parse(a.eta.split('/')[1]);
-        var ano1 = int.parse(a.eta.split('/')[2]);
-
-        var dia2 = int.parse(b.eta.split('/')[0]);
-        var mes2 = int.parse(b.eta.split('/')[1]);
-        var ano2 = int.parse(b.eta.split('/')[2]);
-
-        return DateTime(ano2, mes2, dia2).millisecondsSinceEpoch -
-            DateTime(ano1, mes1, dia1).millisecondsSinceEpoch;
-      });
-
       shipments.clear();
       shipments.addAll(list);
 

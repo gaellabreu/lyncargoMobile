@@ -16,10 +16,8 @@ class Shipments {
       : code = json['codigo'],
         description = json['descripcion_carga'],
         status = json['estatus'],
-        eta = f.format(new DateTime.fromMillisecondsSinceEpoch(
-            DateTime.parse(json['eta'].toString()).millisecondsSinceEpoch)),
-        ets = f.format(new DateTime.fromMillisecondsSinceEpoch(
-            DateTime.parse(json['ets'].toString()).millisecondsSinceEpoch)),
+        eta = f.format(new DateTime.fromMillisecondsSinceEpoch(json['eta'])),
+        ets = f.format(new DateTime.fromMillisecondsSinceEpoch(json['ets'])),
         hawbl = json['h_aw_bl'],
         disembarked = json['desembarque'],
         embarked = json['embarque'];
